@@ -8,8 +8,11 @@ function BinPacking(containerEl, blocksEl) {
 	this.container = document.querySelector(containerEl);
 	this.blocks = [].slice.call(document.querySelectorAll(blocksEl));
 	this.root = {};
+	// Bindings
+	this._onResize = this._onResize.bind(this);
 	this._updateBinValues();
 	this._sortBlocks();
+	this._addListeners();
 	this.fit();
 }
 
@@ -36,6 +39,18 @@ proto._sortBlocks = function() {
 	this.blocks.sort(function(a, b) {
 		return b.h - a.h;
 	});
+};
+
+proto._addListeners = function() {
+	window.addEventListener('resize', this._onResize);
+};
+
+proto._onResize = function(e) {
+	if (this.container.clientWidth !== this.root.w) {
+		this._updateBinValues();
+		this._sortBlocks();
+		this.fit();
+	}
 };
 
 proto.fit = function() {
