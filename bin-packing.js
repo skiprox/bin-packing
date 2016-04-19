@@ -3,6 +3,12 @@
 /**
  * Bin Packing implementation for the browser (trying to sort of be like masonry)
  * Original algorithm concept taken from http://codeincomplete.com/posts/2011/5/7/bin_packing/
+ * Basically, what we do is we sort the blocks, and then start looping through all of them,
+ * placing them into bins. When we place a block into a bin, we split the bin into 2 new bins
+ * (right and down nodes), which can then be used to put additional blocks into.
+ *
+ * @param {String} - containerEl: The query string for the container element
+ * @param {String} - blocksEl: The query string for the blocks to pack
  */
 function BinPacking(containerEl, blocksEl) {
 	this.container = document.querySelector(containerEl);
@@ -10,6 +16,7 @@ function BinPacking(containerEl, blocksEl) {
 	this.root = {};
 	// Bindings
 	this._onResize = this._onResize.bind(this);
+	// Get up and go
 	this._updateBinValues();
 	this._sortBlocks();
 	this._addListeners();
@@ -18,6 +25,9 @@ function BinPacking(containerEl, blocksEl) {
 
 var proto = BinPacking.prototype;
 
+/**
+ * Update the info about the elements
+ */
 proto._updateBinValues = function() {
 	this.root = {
 		x: 0,
@@ -35,16 +45,28 @@ proto._updateBinValues = function() {
 	}
 };
 
+/**
+ * Sort the blocks into order based on height
+ * since our packing algorithm works best this way
+ */
 proto._sortBlocks = function() {
 	this.blocks.sort(function(a, b) {
 		return b.h - a.h;
 	});
 };
 
+/**
+ * Add listeners for resizing (or other triggers if ya want em)
+ */
 proto._addListeners = function() {
 	window.addEventListener('resize', this._onResize);
 };
 
+/**
+ * On resize, if the container size has changed,
+ * we update bin values, resort the blocks, and fit everything together
+ * @param  {Event} e [The resize event]
+ */
 proto._onResize = function(e) {
 	if (this.container.clientWidth !== this.root.w) {
 		this._updateBinValues();
@@ -53,6 +75,11 @@ proto._onResize = function(e) {
 	}
 };
 
+/**
+ * The fit function
+ * We iterate through the blocks one by one,
+ * and we pack them based on where they will fit
+ */
 proto.fit = function() {
 	var n, node, block;
 	for (n = 0; n < this.blocks.length; n++) {
@@ -67,6 +94,12 @@ proto.fit = function() {
 	}
 };
 
+/**
+ * Find node function, to find a bin to put a block into
+ * @param  {Object} root [The bin we're currently dealing with]
+ * @param  {Float} w    [The width of the block]
+ * @param  {Float} h    [The height of the block]
+ */
 proto.findNode = function(root, w, h) {
 	if (root.used) {
 		return this.findNode(root.right, w, h) || this.findNode(root.down, w, h);
@@ -79,6 +112,12 @@ proto.findNode = function(root, w, h) {
 	}
 };
 
+/**
+ * Split a node after we successfully put a block into it
+ * @param  {Object} node [A bin]
+ * @param  {Float} w    [width of the block]
+ * @param  {Float} h    [height of the block]
+ */
 proto.splitNode = function(node, w, h) {
 	node.used = true;
 	node.down = {
