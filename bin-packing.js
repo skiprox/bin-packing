@@ -34,7 +34,7 @@ proto._updateBinValues = function() {
 
 proto._sortBlocks = function() {
 	this.blocks.sort(function(a, b) {
-		return b.w * b.h - a.w * a.h;
+		return b.h - a.h;
 	});
 };
 
