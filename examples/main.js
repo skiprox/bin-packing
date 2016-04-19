@@ -7,18 +7,19 @@ var Main = (function() {
 
 	return {
 		init : function() {
-			console.log(document.querySelectorAll('.block'));
-			var blocks = document.querySelectorAll('.block');
-			var n = blocks.length;
-			while (n--) {
-				blocks[n].style.position = 'absolute';
-				blocks[n].style.top = '0';
-				blocks[n].style.left = '0';
-				blocks[n].w = blocks[n].clientWidth;
-				blocks[n].h = blocks[n].clientHeight;
+			var container = document.querySelector('.container');
+			var colors = ['red', 'pink', 'green', 'blue', 'orange'];
+			var blocks = [];
+			var i = 0;
+			for (i; i < 100; i++) {
+				blocks[i] = document.createElement('div');
+				blocks[i].setAttribute('class', 'block');
+				blocks[i].style.backgroundColor = colors[i % 5];
+				blocks[i].style.width = Math.floor(Math.random() * 200) + 'px';
+				blocks[i].style.height = Math.floor(Math.random() * 200) + 'px';
+				container.appendChild(blocks[i]);
 			}
-			var binPacks = new BinPacking(500, 500);
-			binPacks.fit(blocks);
+			var binPacks = new BinPacking('.container', '.block');
 			return this;
 		}
 	};

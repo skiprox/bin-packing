@@ -4,21 +4,37 @@
  * Bin Packing implementation for the browser (trying to sort of be like masonry)
  * Original algorithm concept taken from http://codeincomplete.com/posts/2011/5/7/bin_packing/
  */
-function BinPacking(w, h) {
-	this.root = {
-		x: 0,
-		y: 0,
-		w: w,
-		h: h
-	};
+function BinPacking(containerEl, blocksEl) {
+	this.container = document.querySelector(containerEl);
+	this.blocks = document.querySelectorAll(blocksEl);
+	this.root = {};
+	this._updateBinValues();
+	this.fit();
 }
 
 var proto = BinPacking.prototype;
 
-proto.fit = function(blocks) {
+proto._updateBinValues = function() {
+	this.root = {
+		x: 0,
+		y: 0,
+		w: this.container.clientWidth,
+		h: 100000000 // This is obviously bad. need to fix
+	};
+	var blocksLen = this.blocks.length;
+	while (blocksLen--) {
+		this.blocks[blocksLen].style.position = 'absolute';
+		this.blocks[blocksLen].style.top = '0';
+		this.blocks[blocksLen].style.left = '0';
+		this.blocks[blocksLen].w = this.blocks[blocksLen].clientWidth;
+		this.blocks[blocksLen].h = this.blocks[blocksLen].clientHeight;
+	}
+};
+
+proto.fit = function() {
 	var n, node, block;
-	for (n = 0; n < blocks.length; n++) {
-		block = blocks[n];
+	for (n = 0; n < this.blocks.length; n++) {
+		block = this.blocks[n];
 		if (node = this.findNode(this.root, block.w, block.h)) {
 			block.fit = this.splitNode(node, block.w, block.h);
 			console.log('The returned block', block);
