@@ -6,9 +6,10 @@
  */
 function BinPacking(containerEl, blocksEl) {
 	this.container = document.querySelector(containerEl);
-	this.blocks = document.querySelectorAll(blocksEl);
+	this.blocks = [].slice.call(document.querySelectorAll(blocksEl));
 	this.root = {};
 	this._updateBinValues();
+	this._sortBlocks();
 	this.fit();
 }
 
@@ -31,13 +32,18 @@ proto._updateBinValues = function() {
 	}
 };
 
+proto._sortBlocks = function() {
+	this.blocks.sort(function(a, b) {
+		return b.w * b.h - a.w * a.h;
+	});
+};
+
 proto.fit = function() {
 	var n, node, block;
 	for (n = 0; n < this.blocks.length; n++) {
 		block = this.blocks[n];
 		if (node = this.findNode(this.root, block.w, block.h)) {
 			block.fit = this.splitNode(node, block.w, block.h);
-			console.log('The returned block', block);
 			block.style.transform = 'translate(' + block.fit.x + 'px, ' + block.fit.y + 'px)';
 		}
 		else {
